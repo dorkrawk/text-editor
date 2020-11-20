@@ -31,12 +31,17 @@ class Editor
 
   def handle_input
     char = $stdin.getc
+    if char == "\e"
+      char << $stdin.read_nonblock(3) rescue nil
+      char << $stdin.read_nonblock(2) rescue nil
+    end
     case char
     when "\C-q" then exit(0)
-    when "\C-p" then @cursor = @cursor.up(@buffer)
-    when "\C-n" then @cursor = @cursor.down(@buffer)
-    when "\C-b" then @cursor = @cursor.left(@buffer)
-    when "\C-f" then @cursor = @cursor.right(@buffer)
+    when "\e[A" then @cursor = @cursor.up(@buffer)
+    when "\e[B" then @cursor = @cursor.down(@buffer)
+    when "\e[D" then @cursor = @cursor.left(@buffer)
+    when "\e[C" then @cursor = @cursor.right(@buffer)
+    when "\e" then @buffer = Buffer.new(["bad"])
     when "\C-u" then restore_snapshot
     when "\r"
       save_snapshot
